@@ -11,7 +11,7 @@
 {
   debug
   auto_https ignore_loaded_certs
-  email <some-email>
+  email example@mail.com
   on_demand_tls {
     ask http://something/ask
   }

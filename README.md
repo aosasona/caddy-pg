@@ -1,0 +1,124 @@
+# Example result
+
+```json
+{
+	"warnings": [
+		{
+			"file": "Caddyfile",
+			"line": 12,
+			"message": "Caddyfile input is not formatted; run 'caddy fmt --overwrite' to fix inconsistencies"
+		}
+	],
+	"result": {
+		"admin": {
+			"listen": "0.0.0.0:2019"
+		},
+		"logging": {
+			"logs": {
+				"default": {
+					"level": "DEBUG"
+				}
+			}
+		},
+		"apps": {
+			"http": {
+				"servers": {
+					"srv0": {
+						"listen": [":443"],
+						"routes": [
+							{
+								"match": [
+									{
+										"host": ["admin.fate.test"]
+									}
+								],
+								"handle": [
+									{
+										"handler": "subroute",
+										"routes": [
+											{
+												"handle": [
+													{
+														"handler": "reverse_proxy",
+														"upstreams": [
+															{
+																"dial": "0.0.0.0:19000"
+															}
+														]
+													}
+												]
+											}
+										]
+									}
+								],
+								"terminal": true
+							}
+						],
+						"automatic_https": {
+							"ignore_loaded_certificates": true
+						}
+					},
+					"srv1": {
+						"listen": [":80"],
+						"routes": [
+							{
+								"match": [
+									{
+										"host": ["admin.fate.test"]
+									}
+								],
+								"handle": [
+									{
+										"handler": "subroute",
+										"routes": [
+											{
+												"handle": [
+													{
+														"handler": "reverse_proxy",
+														"upstreams": [
+															{
+																"dial": "0.0.0.0:19000"
+															}
+														]
+													}
+												]
+											}
+										]
+									}
+								],
+								"terminal": true
+							}
+						],
+						"automatic_https": {
+							"ignore_loaded_certificates": true
+						}
+					}
+				}
+			},
+			"tls": {
+				"automation": {
+					"policies": [
+						{
+							"subjects": ["admin.fate.test"],
+							"issuers": [
+								{
+									"email": "example@mail.com",
+									"module": "acme"
+								},
+								{
+									"email": "example@mail.com",
+									"module": "zerossl"
+								}
+							],
+							"on_demand": true
+						}
+					],
+					"on_demand": {
+						"ask": "http://something/ask"
+					}
+				}
+			}
+		}
+	}
+}
+```
