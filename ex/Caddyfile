@@ -1,0 +1,34 @@
+#--------------------------------------------------------------------------
+# Reverse proxy
+# https://caddyserver.com/docs/caddyfile/directives/reverse_proxy
+#
+# REQUEST
+#
+# curl "http://localhost:2019/adapt" \
+#         -H "Content-Type: text/caddyfile" \
+#         --data-binary @Caddyfile | jq .result
+#--------------------------------------------------------------------------
+#
+{
+  debug
+  auto_https ignore_loaded_certs
+  email example@mail.com
+  on_demand_tls {
+    ask http://something/ask
+  }
+  admin 0.0.0.0:2019
+}
+
+# HTTP site block
+admin.fate.test:80 {
+  reverse_proxy 0.0.0.0:19000
+  # redir https://{host}{uri} permanent
+}
+
+# HTTPS site block
+admin.fate.test:443 {
+  tls {
+    on_demand
+  }
+  reverse_proxy 0.0.0.0:19000
+}

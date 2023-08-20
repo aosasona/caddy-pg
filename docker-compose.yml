@@ -1,0 +1,26 @@
+version: "3.9"
+services:
+  cpg:
+    container_name: cpg
+    build:
+      context: .
+      dockerfile: Dockerfile
+    ports:
+      - "6900:6900"
+    depends_on:
+      - proxy
+    networks:
+      - cpg_network
+  proxy:
+    image: caddy:2.7.0
+    container_name: proxy
+    restart: unless-stopped
+    entrypoint: caddy run --resume
+    volumes:
+      - $PWD/Caddyfile:/etc/caddy/Caddyfile
+      - ./caddy/data:/data
+      - ./caddy/config:/config
+    networks:
+      - cpg_network
+networks:
+  cpg_network:
